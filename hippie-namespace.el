@@ -1,11 +1,11 @@
-;;; hippie-namespace.el --- Special treatment for namepsace prefixes in hippie-expand
+;;; hippie-namespace.el --- Special treatment for namespace prefixes in hippie-expand
 ;;
 ;; Copyright (c) 2012 Roland Walker
 ;;
 ;; Author: Roland Walker walker@pobox.com
 ;; URL: https://github.com/rolandwalker/hippie-namespace.el
-;; Version: 0.5.0
-;; Last-Updated: 19 Aug 2012
+;; Version: 0.5.1
+;; Last-Updated: 21 Aug 2012
 ;; EmacsWiki: HippieNamespace
 ;; Keywords: completion
 ;;
@@ -76,16 +76,16 @@
 ;;
 ;; Bugs
 ;;
-;;     Breaks using C-u [hippie-expand] to undo. Workaround: use
+;;     Breaks using C-u [hippie-expand] to undo.  Workaround: use
 ;;     regular undo commands.
 ;;
 ;; TODO
 ;;
 ;;     more and better language-specific functions
 ;;
-;;     javascript namespaces implicit, and a pain to deduce
+;;     JavaScript namespaces are implicit, and a pain to deduce
 ;;
-;;     clever interface to support identical subseqs in the
+;;     clever interface to support identical subsequences in the
 ;;     namespace list
 ;;
 ;;     periodic refresh: idle-timer and save hook?
@@ -112,7 +112,7 @@
 ;;  This software is provided by Roland Walker "AS IS" and any express
 ;;  or implied warranties, including, but not limited to, the implied
 ;;  warranties of merchantability and fitness for a particular
-;;  purpose are disclaimed. In no event shall Roland Walker or
+;;  purpose are disclaimed.  In no event shall Roland Walker or
 ;;  contributors be liable for any direct, indirect, incidental,
 ;;  special, exemplary, or consequential damages (including, but not
 ;;  limited to, procurement of substitute goods or services; loss of
@@ -147,8 +147,8 @@
 
 ;;;###autoload
 (defgroup hippie-namespace nil
-  "Special treatment for namepsace prefixes in `hippie-expand'."
-  :version "0.5.0"
+  "Special treatment for namespace prefixes in `hippie-expand'."
+  :version "0.5.1"
   :link '(emacs-commentary-link "hippie-namespace")
   :prefix "hippie-namespace-"
   :group 'hippie-expand
@@ -164,7 +164,11 @@ by imenu, which only considers definitions."
   :group 'hippie-namespace)
 
 (defcustom hippie-namespace-popularity-cutoff .20
-  "A common prefix must be found on this fraction of symbols in a buffer to be considered.
+  "Fraction of symbols having a common prefix for namespace detection.
+
+One of the methods used by `hippie-namespace' to autodetect
+namespaces is popularity.  This is the minimum popularity needed
+for consideration.
 
 The default value is .20, meaning 20%."
   :type 'float
@@ -176,7 +180,7 @@ The default value is .20, meaning 20%."
   :group 'hippie-namespace)
 
 (defcustom hippie-namespace-max-elements 10
-  "The maximum number of elements against which `try-expand-namespace' will attempt completion.
+  "Max elements against which `try-expand-namespace' will attempt completion.
 
 Set to nil or a very large number if you don't want a limit."
   :type 'integer
@@ -222,7 +226,7 @@ lighter for `hippie-namespace-mode'."
   :group 'hippie-namespace-global)
 
 (defcustom hippie-namespace-buffer-name-exclude-pattern "\\`[* ]"
-  "The minor mode will not be activated if a buffer's name matches this regular expression.
+  "Do not activate minor made in buffers matching this regular expression.
 
 The default pattern is designed to match buffers which are
 programatically generated or internal to Emacs."
@@ -230,7 +234,7 @@ programatically generated or internal to Emacs."
   :group 'hippie-namespace-global)
 
 (defcustom hippie-namespace-buffer-include-functions '(buffer-file-name)
-  "The minor mode will not be activated in a buffer unless all listed functions evaluate to non-nil.
+  "Do not activate minor mode in a buffer unless all functions evaluate non-nil.
 
 Each function should take a single argument (a buffer).  The
 default filter causes `hippie-namespace-mode' to consider only buffers
@@ -241,7 +245,7 @@ Set this value to nil to disable."
   :group 'hippie-namespace-global)
 
 (defcustom hippie-namespace-buffer-exclude-functions '()
-  "The minor mode will not be activated in a buffer if any listed functions evaluate to non-nil.
+  "Do not activate minor mode in a buffer if any function evaluates non-nil.
 
 Each function should take a single argument (a buffer).
 
@@ -264,7 +268,10 @@ Set this value to nil to disable."
 ;;; macros
 
 (defmacro hippie-namespace-called-interactively-p (&optional kind)
-  "A backward-compatible version of `called-interactively-p'."
+  "A backward-compatible version of `called-interactively-p'.
+
+Optional KIND is as documented at `called-interactively-p'
+in GNU Emacs 24.1 or higher."
   `(if (eq 0 (cdr (subr-arity (symbol-function 'called-interactively-p))))
       (called-interactively-p)
     (called-interactively-p ,kind)))
@@ -361,7 +368,9 @@ If called with a negative ARG, deactivate `hippie-namespace-mode' in the buffer.
 ;;; interactive commands
 
 (defun hippie-namespace-reload (arg)
-  "Force a refresh of `hippie-namespace-computed-list', used by `try-expand-namespace'.
+  "Force a refresh of `hippie-namespace-computed-list'.
+
+`hippie-namespace-computed-list' is used by `try-expand-namespace'.
 
 With prefix ARG, also wipe `hippie-namespace-manual-list'."
   (interactive "P")
@@ -372,7 +381,7 @@ With prefix ARG, also wipe `hippie-namespace-manual-list'."
     (message "%s namespace string%s available." (length hippie-namespace-computed-list) (if (= 1 (length hippie-namespace-computed-list)) "" "s"))))
 
 (defun hippie-namespace-add (namespace)
-  "Manually add NAMESPACE to the list of namespaces available to `try-expand-namespace'.
+  "Manually add NAMESPACE to the list available to `try-expand-namespace'.
 
 Modifies `hippie-namespace-manual-list', and refreshes by running
 `hippie-namespace-populate-list'."
@@ -386,14 +395,17 @@ Modifies `hippie-namespace-manual-list', and refreshes by running
 
 ;;; the next two functions provide the interface with hippie-expand
 
+;; todo better docstring
 (defun he-namespace-beg ()
+  "Find beginning of expansion."
   (save-excursion
     (skip-syntax-backward "^w_")
     (skip-syntax-backward "w_")
     (point)))
 
+;; todo better docstring
 (defun try-expand-namespace (old)
-  "Try to expand an element of `hippie-namespace-computed-list' in `hippie-expand'.
+  "Expand an element of `hippie-namespace-computed-list' in `hippie-expand'.
 
 Intended to be used as the first element of
 `hippie-expand-try-functions-list'."
@@ -507,7 +519,7 @@ not symbols may be included in the result."
     sym-strings))
 
 (defun hippie-namespace-all-imenu-definitions ()
-  "Returns a list strings representing all symbol definitions as determined by imenu."
+  "Return a list strings representing all symbol definitions as determined by imenu."
   (ignore-errors
     (with-no-warnings
       (imenu--cleanup))
@@ -530,6 +542,7 @@ not symbols may be included in the result."
 (defalias 'hippie-namespace-finder-emacs-lisp-mode 'hippie-namespace-finder-lisp-mode)
 
 (defun hippie-namespace-finder-lisp-mode ()
+  "Scan code for Lisp-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
     (while (re-search-forward "^[ \t]*\\((defgroup\\)" nil t)
@@ -543,9 +556,10 @@ not symbols may be included in the result."
             (push (cadr (nthcdr arg-pos dg)) namespaces)))))
     namespaces))
 
-(defalias 'hippie-namespace-finder-perl-mode 'hippie-namespace-finder-cperl-mode)
+(defalias 'hippie-namespace-finder-cperl-mode 'hippie-namespace-finder-perl-mode)
 
-(defun hippie-namespace-finder-cperl-mode ()
+(defun hippie-namespace-finder-perl-mode ()
+  "Scan code for Perl-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
     (while (re-search-forward "^[ \t]*use[ \t\n]+\\([A-Z][^ \t\n;]+\\)" nil t)
@@ -556,6 +570,7 @@ not symbols may be included in the result."
     namespaces))
 
 (defun hippie-namespace-finder-python-mode ()
+  "Scan code for Python-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
     (while (re-search-forward "^[ \t]*from[ \t]+\\([^ \t\n]+\\)[ \t]+import" nil t)
@@ -567,6 +582,7 @@ not symbols may be included in the result."
 
 ;; todo better to read the module names from the content of files loaded by "require"
 (defun hippie-namespace-finder-ruby-mode ()
+  "Scan code for Ruby-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
     (while (re-search-forward "^[ \t]*module[ \t\n]+\\([^ \t\n]+\\)" nil t)
@@ -574,6 +590,7 @@ not symbols may be included in the result."
     namespaces))
 
 (defun hippie-namespace-finder-c++-mode ()
+  "Scan code for C++-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
     (while (re-search-forward "^[ \t]*namespace[ \t\n]+\\([^ \t\n]+\\)" nil t)
@@ -582,6 +599,7 @@ not symbols may be included in the result."
 
 ;; not sure how good this is. PHP code need not start at beginning-of-line, for one
 (defun hippie-namespace-finder-php-mode ()
+  "Scan code for PHP-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
     (while (re-search-forward "^[ \t]*namespace[ \t\n]+\\([^ \t\n;]+\\)" nil t)
@@ -592,6 +610,7 @@ not symbols may be included in the result."
     namespaces))
 
 (defun hippie-namespace-finder-java-mode ()
+  "Scan code for Java-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
     (while (re-search-forward "^[ \t]*import[ \t\n]+\\(?:[^ \t\n;]+\\)\\.\\([^ \.\t\n;]+\\)" nil t)
@@ -603,6 +622,7 @@ not symbols may be included in the result."
 
 ;; todo import() with parens is missing here
 (defun hippie-namespace-finder-go-mode ()
+  "Scan code for Go-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
     (while (re-search-forward "^[ \t]*import[ \t\n]+\"\\(?:[^ \t\n;]+\\)/\\([^ /\t\n;]+\\)\"" nil t)
@@ -637,12 +657,12 @@ not symbols may be included in the result."
     longest))
 
 (defun hippie-namespace-prefix-popular-p (prefix collection cutoff)
-  "Returns t if string PREFIX matches CUTOFF members of COLLECTION."
+  "Return t if string PREFIX matches into COLLECTION above CUTOFF members."
   (>= (length (delq nil (mapcar #'(lambda (s) (string-prefix-p prefix s)) collection)))
       cutoff))
 
 (defun hippie-namespace-strip-prefix-matches (collection)
-  "Remove trailing members of COLLECTION which share a prefix match with any other member.
+  "Remove trailing members of COLLECTION which share a prefix match.
 
 The prefix match may go in either direction.  The first matching
 member of COLLECTION is kept, not the longest.
@@ -669,6 +689,8 @@ A modified copy of COLLECTION is returned."
 ;; require-final-newline: t
 ;; coding: utf-8
 ;; End:
+;;
+;; LocalWords:  HippieNamespace dabbrev setf callf imenu fulltext
 ;;
 
 ;;; hippie-namespace.el ends here

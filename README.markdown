@@ -1,9 +1,9 @@
 Overview
-========
-Special treatment for namepsace prefixes in Emacs hippie-expand
+=========
+Special treatment for namespace prefixes in Emacs hippie-expand.
 
 hippie-namespace
------------
+----------------
 Enabling the minor mode adds a limited number of very common
 prefixes to the hippie-expand expansion list.  These prefixes
 (deduced from buffer content) will be the first completions
@@ -32,12 +32,12 @@ Many people override dabbrev expansion:
 	(define-key global-map (kbd "M-/") 'hippie-expand)
 
 See Also
------------
-	M-x customize-group RET hippie-namespace RET
-	M-x customize-group RET hippie-expand RET
+--------
+M-x customize-group RET hippie-namespace RET
+M-x customize-group RET hippie-expand RET
 
 Bugs
------------
+----
 Breaks using C-u [hippie-expand] to undo. Workaround: use
 regular undo commands.
 
