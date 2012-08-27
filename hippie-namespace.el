@@ -293,6 +293,7 @@ in GNU Emacs 24.1 or higher."
 
 ;;; minor-mode setup
 
+;;;###autoload
 (define-minor-mode hippie-namespace-mode
   "Turn on hippie-namespace-mode.
 
@@ -322,6 +323,7 @@ is 'toggle."
 
 ;;; global minor-mode setup
 
+;;;###autoload
 (define-globalized-minor-mode global-hippie-namespace-mode hippie-namespace-mode hippie-namespace-maybe-turn-on
   :group 'hippie-namespace)
 
@@ -367,6 +369,7 @@ If called with a negative ARG, deactivate `hippie-namespace-mode' in the buffer.
 
 ;;; interactive commands
 
+;;;###autoload
 (defun hippie-namespace-reload (arg)
   "Force a refresh of `hippie-namespace-computed-list'.
 
@@ -380,6 +383,7 @@ With prefix ARG, also wipe `hippie-namespace-manual-list'."
   (when (hippie-namespace-called-interactively-p 'interactive)
     (message "%s namespace string%s available." (length hippie-namespace-computed-list) (if (= 1 (length hippie-namespace-computed-list)) "" "s"))))
 
+;;;###autoload
 (defun hippie-namespace-add (namespace)
   "Manually add NAMESPACE to the list available to `try-expand-namespace'.
 
@@ -428,6 +432,7 @@ Intended to be used as the first element of
 
 ;;; functions to populate the computed namespace list
 
+;;;###autoload
 (defun hippie-namespace-populate-list (&optional force)
   "Populate `hippie-namespace-computed-list' from buffer contents.
 
