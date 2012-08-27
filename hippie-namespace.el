@@ -70,9 +70,11 @@
 ;;    Some attempt is made to detect the import of external
 ;;    namespaces, and a textual analysis is done, but nothing fancy.
 ;;
-;; Compatibility
+;; Compatibility and Requirements
 ;;
 ;;     Tested only on GNU Emacs version 24.1
+;;
+;;     No external dependencies
 ;;
 ;; Bugs
 ;;

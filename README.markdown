@@ -41,3 +41,8 @@ Bugs
 Breaks using C-u [hippie-expand] to undo. Workaround: use
 regular undo commands.
 
+Compatibility and Requirements
+------------------------------
+Tested only on GNU Emacs version 24.1
+
+No external dependencies
