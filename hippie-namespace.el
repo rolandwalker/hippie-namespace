@@ -7,7 +7,7 @@
 ;; Version: 0.5.2
 ;; Last-Updated: 27 Aug 2012
 ;; EmacsWiki: HippieNamespace
-;; Keywords: completion
+;; Keywords: convenience, lisp, tools, completion
 ;;
 ;; Simplified BSD License
 ;;
