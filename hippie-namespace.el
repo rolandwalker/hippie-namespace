@@ -3,7 +3,8 @@
 ;; Copyright (c) 2012 Roland Walker
 ;;
 ;; Author: Roland Walker walker@pobox.com
-;; URL: https://github.com/rolandwalker/hippie-namespace.el
+;; Homepage: http://github.com/rolandwalker/hippie-namespace
+;; URL: http://raw.github.com/rolandwalker/hippie-namespace/master/hippie-namespace.el
 ;; Version: 0.5.2
 ;; Last-Updated: 27 Aug 2012
 ;; EmacsWiki: HippieNamespace
