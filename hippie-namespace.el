@@ -161,7 +161,7 @@
   :prefix "hippie-namespace-"
   :group 'hippie-expand
   :group 'abbreviations
-  :group 'extensions)
+  :group 'convenience)
 
 (defcustom hippie-namespace-full-text-search nil
   "Run a full-text analysis of the buffer looking for prefixes.
