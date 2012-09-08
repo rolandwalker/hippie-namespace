@@ -14,9 +14,23 @@
 ;;
 ;;; Commentary:
 ;;
+;; Quickstart
+;;
+;;     (require 'hippie-namespace)
+;;
+;;     (global-hippie-namespace-mode 1)
+;;
+;;     (define-key global-map (kbd "M-/") 'hippie-expand)
+;;
+;;     hi [M-/]     ; The first one or two letters of a namespace
+;;                  ; found in the current buffer, followed by the
+;;                  ; key bound to `hippie-expand'.
+;;
+;; Explanation
+;;
 ;; The purpose of hippie-namespace is to save typing.
 ;;
-;; Enabling the minor mode adds a limited number of very common
+;; Enabling this minor mode adds a limited number of very common
 ;; prefixes to the `hippie-expand' expansion list.  These prefixes
 ;; (deduced from buffer content) will be the first completions
 ;; considered.
@@ -36,43 +50,46 @@
 ;; To use this library, install the file somewhere that Emacs can find
 ;; it and add the following to your ~/.emacs file
 ;;
-;;    (require 'hippie-namespace)
-;;    (global-hippie-namespace-mode 1)
+;;     (require 'hippie-namespace)
+;;     (global-hippie-namespace-mode 1)
 ;;
 ;; The minor mode will examine each buffer to guess namespace prefixes
 ;; dynamically.  If the guess is not good enough, you may add to the
 ;; list by executing
 ;;
-;;    M-x hippie-namespace-add
+;;     M-x hippie-namespace-add
 ;;
 ;; or by adding a file-local variable at the end of your file:
 ;;
-;;    ;; Local Variables:
-;;    ;; hippie-namespace-local-list: (namespace-1 namespace-2)
-;;    ;; End:
+;;     ;; Local Variables:
+;;     ;; hippie-namespace-local-list: (namespace-1 namespace-2)
+;;     ;; End:
 ;;
 ;; Note that you should also have `hippie-expand' bound to a key.
 ;; Many people override dabbrev expansion:
 ;;
-;;    (define-key global-map (kbd "M-/") 'hippie-expand)
+;;     (define-key global-map (kbd "M-/") 'hippie-expand)
 ;;
 ;; See Also
 ;;
-;;    M-x customize-group RET hippie-namespace RET
-;;    M-x customize-group RET hippie-expand RET
+;;     M-x customize-group RET hippie-namespace RET
+;;     M-x customize-group RET hippie-expand RET
 ;;
 ;; Notes
 ;;
-;;    This mode makes more sense for some languages and less sense for
-;;    others.  In most languages, the declared "namespace" is
-;;    infrequently used in its own context.  (For Emacs Lisp that is
-;;    not the case.)
+;;     This mode makes more sense for some languages and less sense for
+;;     others.  In most languages, the declared "namespace" is
+;;     infrequently used in its own context.  (For Emacs Lisp that is
+;;     not the case.)
 ;;
-;;    Some attempt is made to detect the import of external
-;;    namespaces, and a textual analysis is done, but nothing fancy.
+;;     Some attempt is made to detect the import of external
+;;     namespaces, and a textual analysis is done, but nothing fancy.
 ;;
-;;    Integrates with `expand-region', adding an expansion which is
-;;    aware of the namespace and non-namespace portions of a symbol.
+;;     Integrates with `expand-region', adding an expansion which is
+;;     aware of the namespace and non-namespace portions of a symbol.
+;;
+;;     Mode-specific namespace finders are easy to add.  Search for
+;;     "Howto" in the source.
 ;;
 ;; Compatibility and Requirements
 ;;

@@ -1,10 +1,26 @@
 Overview
 =========
+
 Special treatment for namespace prefixes in Emacs hippie-expand.
+
+Quickstart
+----------
+
+	(require 'hippie-namespace)
+
+	(global-hippie-namespace-mode 1)
+
+	(define-key global-map (kbd "M-/") 'hippie-expand)
+
+	hi [M-/]     ; The first one or two letters of a namespace
+	             ; found in the current buffer, followed by the
+	             ; key bound to `hippie-expand'.
+
 
 hippie-namespace
 ----------------
-Enabling the minor mode adds a limited number of very common
+
+Enabling this minor mode adds a limited number of very common
 prefixes to the hippie-expand expansion list.  These prefixes
 (deduced from buffer content) will be the first completions
 considered.
@@ -37,18 +53,24 @@ Notes
 Integrates with `expand-region`, adding an expansion which is aware of the
 namespace and non-namespace portions of a symbol.
 
+Mode-specific namespace finders are easy to add.  Search for "Howto" in the
+source.
+
 See Also
 --------
+
 M-x customize-group RET hippie-namespace RET
 M-x customize-group RET hippie-expand RET
 
 Bugs
 ----
+
 Breaks using C-u [hippie-expand] to undo. Workaround: use
 regular undo commands.
 
 Compatibility and Requirements
 ------------------------------
+
 Tested on GNU Emacs versions 23.3 and 24.1
 
 No external dependencies
