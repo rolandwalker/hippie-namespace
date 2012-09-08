@@ -550,9 +550,9 @@ not symbols may be included in the result."
       (imenu--cleanup))
     (setq imenu--index-alist nil)
     (imenu--make-index-alist))
-  (remove-if-not #'stringp (hippie-namespace-list-flatten (mapcar (lambda (item)
-                                                               (if (and item (imenu--subalist-p item))
-                                                                   (cdr item) item)) imenu--index-alist))))
+  (remove-if-not 'stringp (hippie-namespace-list-flatten (mapcar #'(lambda (item)
+                                                                     (if (and item (imenu--subalist-p item))
+                                                                         (cdr item) item)) imenu--index-alist))))
 
 
 ;;; mode-specific namespace finder functions
