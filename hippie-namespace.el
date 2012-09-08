@@ -659,14 +659,16 @@ not symbols may be included in the result."
 
 ;;; utility functions
 
-;; this strips nils, which would be a bug in some contexts
 (defun hippie-namespace-list-flatten (list)
   "Flatten LIST which may contain other lists."
   (cond
     ((null list)
      nil)
-    ((listp list)
+    ((and (listp list)
+          (consp (car list)))
      (append (hippie-namespace-list-flatten (car list)) (hippie-namespace-list-flatten (cdr list))))
+    ((listp list)
+     (cons (car list) (hippie-namespace-list-flatten (cdr list))))
     (t
      (list list))))
 
