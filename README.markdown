@@ -31,6 +31,12 @@ Many people override dabbrev expansion:
 
 	(define-key global-map (kbd "M-/") 'hippie-expand)
 
+Notes
+-----
+
+Integrates with `expand-region`, adding an expansion which is aware of the
+namespace and non-namespace portions of a symbol.
+
 See Also
 --------
 M-x customize-group RET hippie-namespace RET

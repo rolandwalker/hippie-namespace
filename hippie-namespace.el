@@ -71,6 +71,9 @@
 ;;    Some attempt is made to detect the import of external
 ;;    namespaces, and a textual analysis is done, but nothing fancy.
 ;;
+;;    Integrates with `expand-region', adding an expansion which is
+;;    aware of the namespace and non-namespace portions of a symbol.
+;;
 ;; Compatibility and Requirements
 ;;
 ;;     Tested on GNU Emacs versions 23.3 and 24.1
@@ -140,6 +143,7 @@
 
 ;; for setf, loop, position, remove-if, remove-if-not, callf, callf2
 (eval-when-compile
+  (defvar er/try-expand-list)
   (require 'cl))
 
 (require 'imenu)
@@ -210,6 +214,14 @@ lighter for `hippie-namespace-mode'."
 
 (defcustom hippie-namespace-no-localize-try-functions nil
   "Don't make `try-functions-list' buffer-local."
+  :type 'boolean
+  :group 'hippie-namespace)
+
+(defcustom hippie-namespace-expand-region t
+  "Integrate with `expand-region' if present.
+
+Add an expansion to `expand-region' which matches the namespace
+or non-namespace portion of a symbol."
   :type 'boolean
   :group 'hippie-namespace)
 
@@ -690,6 +702,45 @@ A modified copy of COLLECTION is returned."
             (throw 'next t)))
         (push elt uniques)))
     (nreverse uniques)))
+
+;;; expand-region integration
+
+;;;###autoload
+(defun hippie-namespace-mark-symbol-portion ()
+  "Mark the namespace or non-namespace portion of a symbol under the point.
+
+Intended for use with `expand-region' as an element of
+`er/try-expand-list'.
+
+If the point is in the namespace or non-namespace portion of
+a symbol, mark only that portion of the symbol.
+
+If the point is in a symbol which does not match a namespace,
+there is no effect."
+  (interactive)
+  (when (and (boundp 'hippie-namespace-mode)
+             hippie-namespace-mode
+             (boundp 'hippie-namespace-computed-list)
+             (> (length hippie-namespace-computed-list) 0))
+    (let ((orig-point (point)))
+      (save-match-data
+        (skip-syntax-backward "_w")
+        (when (looking-at (regexp-opt hippie-namespace-computed-list))
+          (set-mark (match-end 0))
+          (if (> (match-end 0) orig-point)
+              (goto-char (match-beginning 0))
+            ;; else
+            (skip-syntax-forward "_w")
+            (exchange-point-and-mark)))))))
+
+(when hippie-namespace-expand-region
+  (eval-after-load "expand-region"
+    '(progn
+       ;; insert in front of 'er/mark-symbol
+       (unless (memq 'hippie-namespace-mark-symbol-portion er/try-expand-list)
+         (push 'hippie-namespace-mark-symbol-portion
+               (nthcdr (or (position 'er/mark-symbol er/try-expand-list) 0)
+                       er/try-expand-list))))))
 
 (provide 'hippie-namespace)
 
