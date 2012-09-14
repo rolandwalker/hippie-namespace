@@ -5,8 +5,8 @@
 ;; Author: Roland Walker <walker@pobox.com>
 ;; Homepage: http://github.com/rolandwalker/hippie-namespace
 ;; URL: http://raw.github.com/rolandwalker/hippie-namespace/master/hippie-namespace.el
-;; Version: 0.5.3
-;; Last-Updated: 8 Sep 2012
+;; Version: 0.5.4
+;; Last-Updated: 14 Sep 2012
 ;; EmacsWiki: HippieNamespace
 ;; Keywords: convenience, lisp, tools, completion
 ;;
@@ -175,7 +175,7 @@
 ;;;###autoload
 (defgroup hippie-namespace nil
   "Special treatment for namespace prefixes in `hippie-expand'."
-  :version "0.5.3"
+  :version "0.5.4"
   :link '(emacs-commentary-link "hippie-namespace")
   :prefix "hippie-namespace-"
   :group 'hippie-expand
