@@ -158,17 +158,15 @@
 ;;; requires
 ;;;
 
-;; for setf, loop, position, remove-if, remove-if-not, callf, callf2
-(eval-when-compile
-  (defvar er/try-expand-list)
-  (require 'cl))
+;; for setf, loop, callf, callf2, position, remove-if, remove-if-not
+(require 'cl)
 
 (require 'imenu)
 (require 'hippie-exp)
 
-(declare-function position      "cl-seq.el")
-(declare-function remove-if     "cl-seq.el")
-(declare-function remove-if-not "cl-seq.el")
+(eval-when-compile
+  ;; declarations for byte compiler
+  (defvar er/try-expand-list))
 
 ;;;
 ;;; customizable variables
