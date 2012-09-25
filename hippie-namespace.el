@@ -290,10 +290,12 @@ Set this value to nil to disable."
 
 ;;; variables
 
+(defvar hippie-namespace-mode          nil "Mode variable for `hippie-namespace-mode'.")
 (defvar hippie-namespace-local-list    nil "List of namespaces to be provided as a file-local variable.")
 (defvar hippie-namespace-manual-list   nil "List of namespaces entered manually by `hippie-namespace-add'.")
 (defvar hippie-namespace-computed-list nil "Computed list of namespaces derived from all sources.")
 
+(make-variable-buffer-local 'hippie-namespace-mode)
 (make-variable-buffer-local 'hippie-namespace-local-list)
 (make-variable-buffer-local 'hippie-namespace-manual-list)
 (make-variable-buffer-local 'hippie-namespace-computed-list)
