@@ -313,128 +313,7 @@ in GNU Emacs 24.1 or higher."
       '(called-interactively-p)
     `(called-interactively-p ,kind)))
 
-;;; advice for hippie-expand functions
-
-;; todo bug: breaks using C-u hippie-expand to undo - b/c
-;; hippie-expand no longer knows the original string boundary.
-(defadvice hippie-expand (after hippie-expand-accept-namespace activate)
-  "Causes an expansion from `try-expand-namespace' to be accepted immediately."
-  (when (and hippie-namespace-mode
-             (= 0 he-num)
-             (eq (nth he-num hippie-expand-try-functions-list) 'try-expand-namespace)
-             (memq (car he-tried-table) hippie-namespace-computed-list))
-    ;; (setq he-tried-table nil)
-    ;; (setq he-num -1)
-    (setq he-search-string (car he-tried-table))
-    (pop he-tried-table)))
-
-;;; minor-mode setup
-
-;;;###autoload
-(define-minor-mode hippie-namespace-mode
-  "Turn on hippie-namespace-mode.
-
-When called interactively with no prefix argument this command
-toggles the mode.  With a prefix argument, it enables the mode
-if the argument is positive and otherwise disables the mode.
-
-When called from Lisp, this command enables the mode if the
-argument is omitted or nil, and toggles the mode if the argument
-is 'toggle."
-  :lighter hippie-namespace-mode-lighter
-  :group 'hippie-namespace
-  (cond
-    (hippie-namespace-mode
-     (hippie-namespace-populate-list)
-     (unless hippie-namespace-no-localize-try-functions
-       (make-local-variable 'hippie-expand-try-functions-list))
-     (push 'try-expand-namespace hippie-expand-try-functions-list)
-     (delete-dups hippie-expand-try-functions-list)
-     (when (and (hippie-namespace-called-interactively-p 'interactive) (not hippie-namespace-less-feedback))
-       (message "hippie-namespace mode enabled")))
-    (t
-     (setq hippie-namespace-computed-list nil)
-     (callf2 delq 'try-expand-namespace hippie-expand-try-functions-list)
-     (when (and (hippie-namespace-called-interactively-p 'interactive) (not hippie-namespace-less-feedback))
-       (message "hippie-namespace mode disabled")))))
-
-;;; global minor-mode setup
-
-;;;###autoload
-(define-globalized-minor-mode global-hippie-namespace-mode hippie-namespace-mode hippie-namespace-maybe-turn-on
-  :group 'hippie-namespace)
-
-(defun hippie-namespace-maybe-turn-on (&optional arg)
-  "Called by `global-hippie-namespace-mode' to activate `hippie-namespace-mode' in a buffer if appropriate.
-
-`hippie-namespace-mode' will be activated in every buffer, except
-
-   minibuffers
-   buffers with names that begin with space
-   buffers excluded by `hippie-namespace-exclude-modes'
-   buffers excluded by `hippie-namespace-buffer-name-exclude-pattern'
-   buffers that fail   `hippie-namespace-include-functions'
-   buffers that pass   `hippie-namespace-exclude-functions'
-
-If called with a negative ARG, deactivate `hippie-namespace-mode' in the buffer."
-  (callf or arg 1)
-  (when (or (< arg 0)
-            (hippie-namespace-buffer-included-p (current-buffer)))
-    (hippie-namespace-mode arg)))
-
-(defun hippie-namespace-buffer-included-p (buf)
-  "Return BUF if `global-hippie-namespace-mode' should enable `hippie-namespace-mode' in BUF."
-  (when (and (not noninteractive)
-             (bufferp buf)
-             (buffer-name buf))
-    (with-current-buffer buf
-      (when (and (not (minibufferp buf))
-                 (not (eq (aref (buffer-name) 0) ?\s))           ; overlaps with hippie-namespace-buffer-exclude-pattern
-                 (not (memq major-mode hippie-namespace-exclude-modes))
-                 (not (string-match-p hippie-namespace-buffer-name-exclude-pattern (buffer-name buf)))
-                 (catch 'success
-                   (dolist (filt hippie-namespace-buffer-exclude-functions)
-                     (when (funcall filt buf)
-                       (throw 'success nil)))
-                   t)
-                 (catch 'failure
-                   (dolist (filt hippie-namespace-buffer-include-functions)
-                     (unless (funcall filt buf)
-                       (throw 'failure nil)))
-                   t))
-        buf))))
-
-;;; interactive commands
-
-;;;###autoload
-(defun hippie-namespace-reload (arg)
-  "Force a refresh of `hippie-namespace-computed-list'.
-
-`hippie-namespace-computed-list' is used by `try-expand-namespace'.
-
-With prefix ARG, also wipe `hippie-namespace-manual-list'."
-  (interactive "P")
-  (when arg
-    (setq hippie-namespace-manual-list nil))
-  (hippie-namespace-populate-list 'force)
-  (when (hippie-namespace-called-interactively-p 'interactive)
-    (message "%s namespace string%s available." (length hippie-namespace-computed-list) (if (= 1 (length hippie-namespace-computed-list)) "" "s"))))
-
-;;;###autoload
-(defun hippie-namespace-add (namespace)
-  "Manually add NAMESPACE to the list available to `try-expand-namespace'.
-
-Modifies `hippie-namespace-manual-list', and refreshes by running
-`hippie-namespace-populate-list'."
-  (interactive "sNamespace to add: ")
-  (unless (string-match-p "\\`\\(?:\\sw\\|\\s_\\)+\\'" namespace)
-    (error "Bad namespace"))
-  (add-to-list 'hippie-namespace-manual-list namespace t)
-  (hippie-namespace-populate-list 'force)
-  (when (hippie-namespace-called-interactively-p 'interactive)
-    (message "%s namespace string%s available." (length hippie-namespace-computed-list) (if (= 1 (length hippie-namespace-computed-list)) "" "s"))))
-
-;;; the next two functions provide the interface with hippie-expand
+;;; interface to hippie-expand
 
 ;; todo better docstring
 (defun he-namespace-beg ()
@@ -467,59 +346,96 @@ Intended to be used as the first element of
     (pop he-expand-list)
     t))
 
-;;; functions to populate the computed namespace list
+;; advice for hippie-expand functions
 
-;;;###autoload
-(defun hippie-namespace-populate-list (&optional force)
-  "Populate `hippie-namespace-computed-list' from buffer contents.
+;; todo bug: breaks using C-u hippie-expand to undo - b/c
+;; hippie-expand no longer knows the original string boundary.
+(defadvice hippie-expand (after hippie-expand-accept-namespace activate)
+  "Causes an expansion from `try-expand-namespace' to be accepted immediately."
+  (when (and hippie-namespace-mode
+             (= 0 he-num)
+             (eq (nth he-num hippie-expand-try-functions-list) 'try-expand-namespace)
+             (memq (car he-tried-table) hippie-namespace-computed-list))
+    ;; (setq he-tried-table nil)
+    ;; (setq he-num -1)
+    (setq he-search-string (car he-tried-table))
+    (pop he-tried-table)))
 
-When optional FORCE is set, repopulate even if
-`hippie-namespace-computed-list' is already set."
+;;; utility functions
 
-  (when (or force (null hippie-namespace-computed-list))
-    (setq hippie-namespace-computed-list (append hippie-namespace-local-list hippie-namespace-manual-list))
+;; buffer functions
 
-    (let ((fn (intern-soft (concat "hippie-namespace-finder-" (symbol-name major-mode)))))
-      (when (fboundp fn)
-        (save-excursion
-          (save-restriction
-            (save-match-data
-              (callf2 append (funcall fn) hippie-namespace-computed-list)))))
+(defun hippie-namespace-buffer-included-p (buf)
+  "Return BUF if `global-hippie-namespace-mode' should enable `hippie-namespace-mode' in BUF."
+  (when (and (not noninteractive)
+             (bufferp buf)
+             (buffer-name buf))
+    (with-current-buffer buf
+      (when (and (not (minibufferp buf))
+                 (not (eq (aref (buffer-name) 0) ?\s))           ; overlaps with hippie-namespace-buffer-exclude-pattern
+                 (not (memq major-mode hippie-namespace-exclude-modes))
+                 (not (string-match-p hippie-namespace-buffer-name-exclude-pattern (buffer-name buf)))
+                 (catch 'success
+                   (dolist (filt hippie-namespace-buffer-exclude-functions)
+                     (when (funcall filt buf)
+                       (throw 'success nil)))
+                   t)
+                 (catch 'failure
+                   (dolist (filt hippie-namespace-buffer-include-functions)
+                     (unless (funcall filt buf)
+                       (throw 'failure nil)))
+                   t))
+        buf))))
 
-      (setq hippie-namespace-computed-list (append (hippie-namespace-generic-finder 'imenu)
-                                                   hippie-namespace-computed-list))
+;; general utility functions
 
-      (when hippie-namespace-full-text-search
-        (setq hippie-namespace-computed-list (append (hippie-namespace-generic-finder 'fulltext)
-                                                     hippie-namespace-computed-list)))
+(defun hippie-namespace-list-flatten (list)
+  "Flatten LIST which may contain other lists."
+  (cond
+    ((null list)
+     nil)
+    ((and (listp list)
+          (consp (car list)))
+     (append (hippie-namespace-list-flatten (car list)) (hippie-namespace-list-flatten (cdr list))))
+    ((listp list)
+     (cons (car list) (hippie-namespace-list-flatten (cdr list))))
+    (t
+     (list list))))
 
-      (callf reverse hippie-namespace-computed-list)          ; now they are in order of priority
-      (callf hippie-namespace-strip-prefix-matches hippie-namespace-computed-list)
-      (delete-dups hippie-namespace-computed-list)
+;; functions to find and manipulate terms and prefixes
 
-      (when (and hippie-namespace-max-elements
-                 (> (length hippie-namespace-computed-list) hippie-namespace-max-elements))
-        (setf (nthcdr hippie-namespace-max-elements hippie-namespace-computed-list) nil)))))
+(defun hippie-namespace-prefix-popular-p (prefix collection cutoff)
+  "Return t if string PREFIX matches into COLLECTION above CUTOFF members."
+  (>= (length (delq nil (mapcar #'(lambda (s) (string-prefix-p prefix s)) collection)))
+      cutoff))
 
-;;; generic namespace-finder functions
+(defun hippie-namespace-longest-prefix (collection cutoff)
+  "Return the longest prefix string in COLLECTION found in at least CUTOFF elements."
+  (let ((longest nil))
+    (dolist (elt collection)
+      (catch 'next
+        (loop for i from (length longest) to (1- (length elt))
+              if (hippie-namespace-prefix-popular-p (substring elt 0 i) collection cutoff)
+              do (setq longest (substring elt 0 i))
+              else do (throw 'next t))))
+    longest))
 
-(defun hippie-namespace-generic-finder (&optional method)
-  "This namespace finder works for any major mode supported by `imenu'.
+(defun hippie-namespace-strip-prefix-matches (collection)
+  "Remove trailing members of COLLECTION which share a prefix match.
 
-If optional METHOD is 'fulltext, scans the full text of the buffer,
-which is slower."
-  (let ((sym-strings (if (eq method 'fulltext) (hippie-namespace-all-symbols) (hippie-namespace-all-imenu-definitions)))
-        (abs-popular-cutoff nil)           ; computed from `hippie-namespace-popularity-cutoff'
-        (namespaces nil))
-    (setq abs-popular-cutoff (truncate (* hippie-namespace-popularity-cutoff (length sym-strings))))
-    (catch 'exhausted
-      (while (> (length sym-strings) abs-popular-cutoff)
-        (let ((prefix (hippie-namespace-longest-prefix sym-strings abs-popular-cutoff)))
-          (if (not (> (length prefix) hippie-namespace-minimum-length))
-              (throw 'exhausted t)
-            (push prefix namespaces)
-            (callf2 remove-if #'(lambda (s) (string-prefix-p prefix s)) sym-strings)))))
-    namespaces))
+The prefix match may go in either direction.  The first matching
+member of COLLECTION is kept, not the longest.
+
+A modified copy of COLLECTION is returned."
+  (let ((uniques nil))
+    (dolist (elt collection)
+      (catch 'next
+        (dolist (pref uniques)
+          (when (or (string-prefix-p elt pref)
+                    (string-prefix-p pref elt))
+            (throw 'next t)))
+        (push elt uniques)))
+    (nreverse uniques)))
 
 ;; todo better removal of language keywords - autocomplete maintains some dictionaries
 (defun hippie-namespace-all-symbols ()
@@ -570,7 +486,25 @@ not symbols may be included in the result."
   (remove-if-not 'stringp (hippie-namespace-list-flatten (mapcar #'(lambda (item)
                                                                      (if (and item (imenu--subalist-p item))
                                                                          (cdr item) item)) imenu--index-alist))))
+;;; generic namespace-finder function
 
+(defun hippie-namespace-generic-finder (&optional method)
+  "This namespace finder works for any major mode supported by `imenu'.
+
+If optional METHOD is 'fulltext, scans the full text of the buffer,
+which is slower."
+  (let ((sym-strings (if (eq method 'fulltext) (hippie-namespace-all-symbols) (hippie-namespace-all-imenu-definitions)))
+        (abs-popular-cutoff nil)           ; computed from `hippie-namespace-popularity-cutoff'
+        (namespaces nil))
+    (setq abs-popular-cutoff (truncate (* hippie-namespace-popularity-cutoff (length sym-strings))))
+    (catch 'exhausted
+      (while (> (length sym-strings) abs-popular-cutoff)
+        (let ((prefix (hippie-namespace-longest-prefix sym-strings abs-popular-cutoff)))
+          (if (not (> (length prefix) hippie-namespace-minimum-length))
+              (throw 'exhausted t)
+            (push prefix namespaces)
+            (callf2 remove-if #'(lambda (s) (string-prefix-p prefix s)) sym-strings)))))
+    namespaces))
 
 ;;; mode-specific namespace finder functions
 ;;
@@ -674,53 +608,39 @@ not symbols may be included in the result."
       (push (concat (match-string-no-properties 1) ".") namespaces))
     namespaces))
 
-;;; utility functions
+;;; populating the computed namespace list
 
-(defun hippie-namespace-list-flatten (list)
-  "Flatten LIST which may contain other lists."
-  (cond
-    ((null list)
-     nil)
-    ((and (listp list)
-          (consp (car list)))
-     (append (hippie-namespace-list-flatten (car list)) (hippie-namespace-list-flatten (cdr list))))
-    ((listp list)
-     (cons (car list) (hippie-namespace-list-flatten (cdr list))))
-    (t
-     (list list))))
+;;;###autoload
+(defun hippie-namespace-populate-list (&optional force)
+  "Populate `hippie-namespace-computed-list' from buffer contents.
 
-(defun hippie-namespace-longest-prefix (collection cutoff)
-  "Return the longest prefix string in COLLECTION found in at least CUTOFF elements."
-  (let ((longest nil))
-    (dolist (elt collection)
-      (catch 'next
-        (loop for i from (length longest) to (1- (length elt))
-              if (hippie-namespace-prefix-popular-p (substring elt 0 i) collection cutoff)
-              do (setq longest (substring elt 0 i))
-              else do (throw 'next t))))
-    longest))
+When optional FORCE is set, repopulate even if
+`hippie-namespace-computed-list' is already set."
 
-(defun hippie-namespace-prefix-popular-p (prefix collection cutoff)
-  "Return t if string PREFIX matches into COLLECTION above CUTOFF members."
-  (>= (length (delq nil (mapcar #'(lambda (s) (string-prefix-p prefix s)) collection)))
-      cutoff))
+  (when (or force (null hippie-namespace-computed-list))
+    (setq hippie-namespace-computed-list (append hippie-namespace-local-list hippie-namespace-manual-list))
 
-(defun hippie-namespace-strip-prefix-matches (collection)
-  "Remove trailing members of COLLECTION which share a prefix match.
+    (let ((fn (intern-soft (concat "hippie-namespace-finder-" (symbol-name major-mode)))))
+      (when (fboundp fn)
+        (save-excursion
+          (save-restriction
+            (save-match-data
+              (callf2 append (funcall fn) hippie-namespace-computed-list)))))
 
-The prefix match may go in either direction.  The first matching
-member of COLLECTION is kept, not the longest.
+      (setq hippie-namespace-computed-list (append (hippie-namespace-generic-finder 'imenu)
+                                                   hippie-namespace-computed-list))
 
-A modified copy of COLLECTION is returned."
-  (let ((uniques nil))
-    (dolist (elt collection)
-      (catch 'next
-        (dolist (pref uniques)
-          (when (or (string-prefix-p elt pref)
-                    (string-prefix-p pref elt))
-            (throw 'next t)))
-        (push elt uniques)))
-    (nreverse uniques)))
+      (when hippie-namespace-full-text-search
+        (setq hippie-namespace-computed-list (append (hippie-namespace-generic-finder 'fulltext)
+                                                     hippie-namespace-computed-list)))
+
+      (callf reverse hippie-namespace-computed-list)          ; now they are in order of priority
+      (callf hippie-namespace-strip-prefix-matches hippie-namespace-computed-list)
+      (delete-dups hippie-namespace-computed-list)
+
+      (when (and hippie-namespace-max-elements
+                 (> (length hippie-namespace-computed-list) hippie-namespace-max-elements))
+        (setf (nthcdr hippie-namespace-max-elements hippie-namespace-computed-list) nil)))))
 
 ;;; expand-region integration
 
@@ -760,6 +680,90 @@ there is no effect."
          (push 'hippie-namespace-mark-symbol-portion
                (nthcdr (or (position 'er/mark-symbol er/try-expand-list) 0)
                        er/try-expand-list))))))
+
+;;; minor-mode setup
+
+;;;###autoload
+(define-minor-mode hippie-namespace-mode
+  "Turn on hippie-namespace-mode.
+
+When called interactively with no prefix argument this command
+toggles the mode.  With a prefix argument, it enables the mode
+if the argument is positive and otherwise disables the mode.
+
+When called from Lisp, this command enables the mode if the
+argument is omitted or nil, and toggles the mode if the argument
+is 'toggle."
+  :lighter hippie-namespace-mode-lighter
+  :group 'hippie-namespace
+  (cond
+    (hippie-namespace-mode
+     (hippie-namespace-populate-list)
+     (unless hippie-namespace-no-localize-try-functions
+       (make-local-variable 'hippie-expand-try-functions-list))
+     (push 'try-expand-namespace hippie-expand-try-functions-list)
+     (delete-dups hippie-expand-try-functions-list)
+     (when (and (hippie-namespace-called-interactively-p 'interactive) (not hippie-namespace-less-feedback))
+       (message "hippie-namespace mode enabled")))
+    (t
+     (setq hippie-namespace-computed-list nil)
+     (callf2 delq 'try-expand-namespace hippie-expand-try-functions-list)
+     (when (and (hippie-namespace-called-interactively-p 'interactive) (not hippie-namespace-less-feedback))
+       (message "hippie-namespace mode disabled")))))
+
+;;; global minor-mode setup
+
+(defun hippie-namespace-maybe-turn-on (&optional arg)
+  "Called by `global-hippie-namespace-mode' to activate `hippie-namespace-mode' in a buffer if appropriate.
+
+`hippie-namespace-mode' will be activated in every buffer, except
+
+   minibuffers
+   buffers with names that begin with space
+   buffers excluded by `hippie-namespace-exclude-modes'
+   buffers excluded by `hippie-namespace-buffer-name-exclude-pattern'
+   buffers that fail   `hippie-namespace-include-functions'
+   buffers that pass   `hippie-namespace-exclude-functions'
+
+If called with a negative ARG, deactivate `hippie-namespace-mode' in the buffer."
+  (callf or arg 1)
+  (when (or (< arg 0)
+            (hippie-namespace-buffer-included-p (current-buffer)))
+    (hippie-namespace-mode arg)))
+
+;;;###autoload
+(define-globalized-minor-mode global-hippie-namespace-mode hippie-namespace-mode hippie-namespace-maybe-turn-on
+  :group 'hippie-namespace)
+
+;;; interactive commands
+
+;;;###autoload
+(defun hippie-namespace-reload (arg)
+  "Force a refresh of `hippie-namespace-computed-list'.
+
+`hippie-namespace-computed-list' is used by `try-expand-namespace'.
+
+With prefix ARG, also wipe `hippie-namespace-manual-list'."
+  (interactive "P")
+  (when arg
+    (setq hippie-namespace-manual-list nil))
+  (hippie-namespace-populate-list 'force)
+  (when (hippie-namespace-called-interactively-p 'interactive)
+    (message "%s namespace string%s available." (length hippie-namespace-computed-list) (if (= 1 (length hippie-namespace-computed-list)) "" "s"))))
+
+;;;###autoload
+(defun hippie-namespace-add (namespace)
+  "Manually add NAMESPACE to the list available to `try-expand-namespace'.
+
+Modifies `hippie-namespace-manual-list', and refreshes by running
+`hippie-namespace-populate-list'."
+  (interactive "sNamespace to add: ")
+  (unless (string-match-p "\\`\\(?:\\sw\\|\\s_\\)+\\'" namespace)
+    (error "Bad namespace"))
+  (add-to-list 'hippie-namespace-manual-list namespace t)
+  (hippie-namespace-populate-list 'force)
+  (when (hippie-namespace-called-interactively-p 'interactive)
+    (message "%s namespace string%s available." (length hippie-namespace-computed-list) (if (= 1 (length hippie-namespace-computed-list)) "" "s"))))
 
 (provide 'hippie-namespace)
 
