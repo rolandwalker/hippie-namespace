@@ -8,16 +8,17 @@ Special treatment for namespace prefixes in Emacs hippie-expand.
 Quickstart
 ----------
 
-	(require 'hippie-namespace)
-
-	(global-hippie-namespace-mode 1)
-
-	(define-key global-map (kbd "M-/") 'hippie-expand)
-
-	hi [M-/]     ; The first one or two letters of a namespace
-	             ; found in the current buffer, followed by the
-	             ; key bound to `hippie-expand'.
-
+```lisp
+(require 'hippie-namespace)
+ 
+(global-hippie-namespace-mode 1)
+ 
+(define-key global-map (kbd "M-/") 'hippie-expand)
+ 
+;; type hi [M-/]     ; The first one or two letters of a namespace
+                     ; found in the current buffer, followed by the
+                     ; key bound to `hippie-expand'.
+```
 
 hippie-namespace
 ----------------
@@ -47,7 +48,9 @@ not the case.)
 Note that you should also have hippie-expand bound to a key.
 Many people override dabbrev expansion:
 
-	(define-key global-map (kbd "M-/") 'hippie-expand)
+```lisp
+(define-key global-map (kbd "M-/") 'hippie-expand)
+```
 
 Notes
 -----
