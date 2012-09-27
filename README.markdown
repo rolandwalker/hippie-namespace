@@ -1,7 +1,7 @@
 [![Build Status](https://secure.travis-ci.org/rolandwalker/hippie-namespace.png)](http://travis-ci.org/rolandwalker/hippie-namespace)
 
 Overview
-=========
+========
 
 Special treatment for namespace prefixes in Emacs hippie-expand.
 
