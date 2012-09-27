@@ -88,7 +88,7 @@
 ;;     Integrates with `expand-region', adding an expansion which is
 ;;     aware of the namespace and non-namespace portions of a symbol.
 ;;
-;;     Mode-specific namespace finders are easy to add.  Search for
+;;     Mode-specific namespace plugins are easy to add.  Search for
 ;;     "Howto" in the source.
 ;;
 ;; Compatibility and Requirements
@@ -486,10 +486,10 @@ not symbols may be included in the result."
   (remove-if-not 'stringp (hippie-namespace-list-flatten (mapcar #'(lambda (item)
                                                                      (if (and item (imenu--subalist-p item))
                                                                          (cdr item) item)) imenu--index-alist))))
-;;; generic namespace-finder function
+;;; generic namespace-finder plugin
 
-(defun hippie-namespace-generic-finder (&optional method)
-  "This namespace finder works for any major mode supported by `imenu'.
+(defun hippie-namespace-generic-plugin (&optional method)
+  "This generic namespace-finder plugin works for major modes supported by `imenu'.
 
 If optional METHOD is 'fulltext, scans the full text of the buffer,
 which is slower."
@@ -506,18 +506,18 @@ which is slower."
             (callf2 remove-if #'(lambda (s) (string-prefix-p prefix s)) sym-strings)))))
     namespaces))
 
-;;; mode-specific namespace finder functions
+;;; mode-specific namespace plugins
 ;;
 ;; Howto:
 ;;
-;; Create a function called hippie-namespace-finder-YOUR-FAVORITE-MODE.
+;; Create a function called hippie-namespace-plugin-YOUR-FAVORITE-MODE.
 ;; The function should return a list of strings, in ascending order of
 ;; preference.
 ;;
 
-(defalias 'hippie-namespace-finder-emacs-lisp-mode 'hippie-namespace-finder-lisp-mode)
+(defalias 'hippie-namespace-plugin-emacs-lisp-mode 'hippie-namespace-plugin-lisp-mode)
 
-(defun hippie-namespace-finder-lisp-mode ()
+(defun hippie-namespace-plugin-lisp-mode ()
   "Scan code for Lisp-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
@@ -532,9 +532,9 @@ which is slower."
             (push (cadr (nthcdr arg-pos dg)) namespaces)))))
     namespaces))
 
-(defalias 'hippie-namespace-finder-cperl-mode 'hippie-namespace-finder-perl-mode)
+(defalias 'hippie-namespace-plugin-cperl-mode 'hippie-namespace-plugin-perl-mode)
 
-(defun hippie-namespace-finder-perl-mode ()
+(defun hippie-namespace-plugin-perl-mode ()
   "Scan code for Perl-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
@@ -545,7 +545,7 @@ which is slower."
       (push (concat (match-string-no-properties 1) "::") namespaces))
     namespaces))
 
-(defun hippie-namespace-finder-python-mode ()
+(defun hippie-namespace-plugin-python-mode ()
   "Scan code for Python-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
@@ -557,7 +557,7 @@ which is slower."
     namespaces))
 
 ;; todo better to read the module names from the content of files loaded by "require"
-(defun hippie-namespace-finder-ruby-mode ()
+(defun hippie-namespace-plugin-ruby-mode ()
   "Scan code for Ruby-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
@@ -565,7 +565,7 @@ which is slower."
       (push (concat (match-string-no-properties 1) ".") namespaces))
     namespaces))
 
-(defun hippie-namespace-finder-c++-mode ()
+(defun hippie-namespace-plugin-c++-mode ()
   "Scan code for C++-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
@@ -574,7 +574,7 @@ which is slower."
     namespaces))
 
 ;; not sure how good this is. PHP code need not start at beginning-of-line, for one
-(defun hippie-namespace-finder-php-mode ()
+(defun hippie-namespace-plugin-php-mode ()
   "Scan code for PHP-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
@@ -585,7 +585,7 @@ which is slower."
       (push (concat "\\" (or (match-string-no-properties 1) (match-string-no-properties 2)) "\\") namespaces))
     namespaces))
 
-(defun hippie-namespace-finder-java-mode ()
+(defun hippie-namespace-plugin-java-mode ()
   "Scan code for Java-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
@@ -597,7 +597,7 @@ which is slower."
     namespaces))
 
 ;; todo import() with parens is missing here
-(defun hippie-namespace-finder-go-mode ()
+(defun hippie-namespace-plugin-go-mode ()
   "Scan code for Go-specific namespace prefixes."
   (let ((namespaces nil))
     (goto-char (point-min))
@@ -620,18 +620,18 @@ When optional FORCE is set, repopulate even if
   (when (or force (null hippie-namespace-computed-list))
     (setq hippie-namespace-computed-list (append hippie-namespace-local-list hippie-namespace-manual-list))
 
-    (let ((fn (intern-soft (concat "hippie-namespace-finder-" (symbol-name major-mode)))))
+    (let ((fn (intern-soft (concat "hippie-namespace-plugin-" (symbol-name major-mode)))))
       (when (fboundp fn)
         (save-excursion
           (save-restriction
             (save-match-data
               (callf2 append (funcall fn) hippie-namespace-computed-list)))))
 
-      (setq hippie-namespace-computed-list (append (hippie-namespace-generic-finder 'imenu)
+      (setq hippie-namespace-computed-list (append (hippie-namespace-generic-plugin 'imenu)
                                                    hippie-namespace-computed-list))
 
       (when hippie-namespace-full-text-search
-        (setq hippie-namespace-computed-list (append (hippie-namespace-generic-finder 'fulltext)
+        (setq hippie-namespace-computed-list (append (hippie-namespace-generic-plugin 'fulltext)
                                                      hippie-namespace-computed-list)))
 
       (callf reverse hippie-namespace-computed-list)          ; now they are in order of priority
