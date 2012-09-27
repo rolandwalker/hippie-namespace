@@ -489,7 +489,7 @@ not symbols may be included in the result."
 ;;; generic namespace-finder plugin
 
 (defun hippie-namespace-generic-plugin (&optional method)
-  "This generic namespace-finder plugin works for major modes supported by `imenu'.
+  "This namespace-finder plugin works for all major modes supported by `imenu'.
 
 If optional METHOD is 'fulltext, scans the full text of the buffer,
 which is slower."
@@ -778,7 +778,8 @@ Modifies `hippie-namespace-manual-list', and refreshes by running
 ;; byte-compile-warnings: (not cl-functions redefine)
 ;; End:
 ;;
-;; LocalWords:  HippieNamespace dabbrev setf callf imenu fulltext
+;; LocalWords: HippieNamespace dabbrev setf callf imenu fulltext
+;; LocalWords: Howto hipn defgroup
 ;;
 
 ;;; hippie-namespace.el ends here
