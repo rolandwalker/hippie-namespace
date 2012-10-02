@@ -171,9 +171,6 @@
   ;; declarations for byte compiler
   (defvar er/try-expand-list))
 
-(declare-function string-match-p  "subr.el")
-(declare-function string-prefix-p "subr.el")
-
 ;;;
 ;;; customizable variables
 ;;;
