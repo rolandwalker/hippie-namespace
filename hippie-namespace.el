@@ -303,6 +303,7 @@ Set this value to nil to disable."
 (make-variable-buffer-local 'hippie-namespace-manual-list)
 (make-variable-buffer-local 'hippie-namespace-computed-list)
 
+;;;###autoload
 (put 'hippie-namespace-local-list 'safe-local-variable 'listp) ; value may be set in file-local fashion to any list
 
 ;;; macros
