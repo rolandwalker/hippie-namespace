@@ -503,8 +503,7 @@ not symbols may be included in the result."
 (defun hippie-namespace-all-imenu-definitions ()
   "Return a list strings representing all symbol definitions as determined by imenu."
   (ignore-errors
-    (with-no-warnings
-      (imenu--cleanup))
+    (imenu--cleanup)
     (setq imenu--index-alist nil)
     (imenu--make-index-alist))
   (remove-if-not 'stringp (hippie-namespace-list-flatten (mapcar #'(lambda (item)
