@@ -85,8 +85,8 @@ namespace and non-namespace portions of a symbol.
 See Also
 --------
 
-M-x customize-group RET hippie-namespace RET
-M-x customize-group RET hippie-expand RET
+M-x customize-group RET hippie-namespace RET  
+M-x customize-group RET hippie-expand RET  
 
 Bugs
 ----
