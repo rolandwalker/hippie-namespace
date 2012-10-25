@@ -159,9 +159,7 @@
 ;;; Code:
 ;;
 
-;;;
-;;; requires
-;;;
+;;; requirements
 
 ;; for setf, loop, callf, callf2, position, remove-if, remove-if-not
 (require 'cl)
@@ -169,13 +167,12 @@
 (require 'imenu)
 (require 'hippie-exp)
 
+;;; declarations
+
 (eval-when-compile
-  ;; declarations for byte compiler
   (defvar er/try-expand-list))
 
-;;;
 ;;; customizable variables
-;;;
 
 ;;;###autoload
 (defgroup hippie-namespace nil
