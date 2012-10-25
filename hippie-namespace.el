@@ -35,17 +35,19 @@
 ;; (deduced from buffer content) will be the first completions
 ;; considered.
 ;;
-;; Furthermore, namespace completions are treated specially: when
-;; `hippie-expand' proposes a namespace completion, it does not cycle.
-;; Instead, the completion is immediately accepted, and further
-;; invocations of `hippie-expand' build from the expanded text.
+;; Furthermore, hippie-namespace completions are treated specially:
+;; when `hippie-expand' proposes a namespace completion, it will not
+;; cycle.  Instead, the namespace completion is implicitly accepted,
+;; and further invocations of `hippie-expand' will build on the
+;; expansion.
 ;;
 ;; For example, the common prefix of all symbols in this library is
-;; "hippie-namespace-".  If the user types "hi [hippie-expand]" or
-;; even just "h [hippie-expand]", the full prefix is expanded.
+;; "hippie-namespace-".  If, while editing this library, the user
+;; types "hi [hippie-expand]" or even just "h [hippie-expand]",
+;; the full prefix is expanded.
 ;;
-;; "hi [hippie-expand] [hippie-expand]" will start cycling through the
-;; completions which match the prefix.
+;; "hi [hippie-expand] [hippie-expand] ..." will then cycle through
+;; all completions which match the prefix.
 ;;
 ;; To use this library, install the file somewhere that Emacs can find
 ;; it and add the following to your ~/.emacs file
@@ -88,7 +90,7 @@
 ;;     Integrates with `expand-region', adding an expansion which is
 ;;     aware of the namespace and non-namespace portions of a symbol.
 ;;
-;;     Mode-specific namespace plugins are easy to add.  Search for
+;;     Mode-specific namespace plugins are easy to write.  Search for
 ;;     "Howto" in the source.
 ;;
 ;; Compatibility and Requirements
@@ -98,7 +100,7 @@
 ;;     GNU Emacs version 23.3           : yes
 ;;     GNU Emacs version 22.3 and lower : no
 ;;
-;;     No external dependencies
+;;     Uses if present: expand-region.el
 ;;
 ;; Bugs
 ;;
@@ -801,7 +803,7 @@ Modifies `hippie-namespace-manual-list', and refreshes by running
 ;; End:
 ;;
 ;; LocalWords: HippieNamespace dabbrev setf callf imenu fulltext
-;; LocalWords: Howto hipn defgroup
+;; LocalWords: Howto hipn defgroup devel
 ;;
 
 ;;; hippie-namespace.el ends here

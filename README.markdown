@@ -20,46 +20,67 @@ Quickstart
                      ; key bound to `hippie-expand'.
 ```
 
-hippie-namespace
-----------------
+Explanation
+-----------
+
+The purpose of hippie-namespace is to save typing.
 
 Enabling this minor mode adds a limited number of very common
-prefixes to the hippie-expand expansion list.  These prefixes
+prefixes to the `hippie-expand` expansion list.  These prefixes
 (deduced from buffer content) will be the first completions
 considered.
 
-Furthermore, namespace completions are treated specially: when
-hippie-expand proposes a namespace completion, it does not cycle.
-Instead, the completion is immediately accepted, and further
-invocations of hippie-expand build from the expanded text.
+Furthermore, hippie-namespace completions are treated specially:
+when `hippie-expand` proposes a namespace completion, it will not
+cycle.  Instead, the namespace completion is implicitly accepted,
+and further invocations of `hippie-expand` will build on the
+expansion.
 
 For example, the common prefix of all symbols in this library is
-"hippie-namespace-".  If the user types "hi [hippie-expand]" or
-even just "h [hippie-expand]", the full prefix is expanded.
+"hippie-namespace-".  If, while editing this library, the user
+types "hi [hippie-expand]" or even just "h [hippie-expand]",
+the full prefix is expanded.
 
-"hi [hippie-expand] [hippie-expand]" will start cycling through the
-completions which match the prefix.
+"hi [hippie-expand] [hippie-expand] ..." will then cycle through
+all completions which match the prefix.
 
 This mode makes more sense for some languages and less sense for
 others.  In most languages, the declared "namespace" is
 infrequently used in its own context.  (For Emacs Lisp that is
 not the case.)
 
-Note that you should also have hippie-expand bound to a key.
+Note that you should also have `hippie-expand` bound to a key.
 Many people override dabbrev expansion:
 
 ```lisp
 (define-key global-map (kbd "M-/") 'hippie-expand)
 ```
 
+Determining Namespaces
+----------------------
+
+The minor mode will examine each buffer to guess namespace prefixes
+dynamically.  If the guess is not good enough, you may add to the
+list by executing
+
+	M-x hippie-namespace-add
+
+or by adding a file-local variable at the end of your file:
+
+```lisp
+;; Local Variables:
+;; hippie-namespace-local-list: (namespace-1 namespace-2)
+;; End:
+```
+
+Mode-specific namespace finders are easy to write.  Search for "Howto"
+in the source.
+
 Notes
 -----
 
-Integrates with `expand-region`, adding an expansion which is aware of the
+Integrates with [expand-region](http://github.com/magnars/expand-region.el), adding an expansion which is aware of the
 namespace and non-namespace portions of a symbol.
-
-Mode-specific namespace finders are easy to add.  Search for "Howto" in the
-source.
 
 See Also
 --------
@@ -81,4 +102,4 @@ Compatibility and Requirements
 	GNU Emacs version 23.3           : yes
 	GNU Emacs version 22.3 and lower : no
 
-No external dependencies
+Uses if present: [expand-region](http://github.com/magnars/expand-region.el)
