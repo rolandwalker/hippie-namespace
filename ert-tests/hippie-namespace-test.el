@@ -51,6 +51,8 @@
 
 ;;; hippie-namespace-add (namespace)
 
+;;; hippie-namespace-mode
+
 ;;; todo test the advised hippie-expand command
 
 ;;

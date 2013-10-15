@@ -179,7 +179,7 @@
   "Special treatment for namespace prefixes in `hippie-expand'."
   :version "0.5.6"
   :link '(emacs-commentary-link :tag "Commentary" "hippie-namespace")
-  :link '(url-link :tag "Github" "http://github.com/rolandwalker/hippie-namespace")
+  :link '(url-link :tag "GitHub" "http://github.com/rolandwalker/hippie-namespace")
   :link '(url-link :tag "EmacsWiki" "http://emacswiki.org/emacs/HippieNamespace")
   :prefix "hippie-namespace-"
   :group 'hippie-expand
