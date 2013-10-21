@@ -223,9 +223,8 @@ Set to nil or a very large number if you don't want a limit."
 Set to nil or the empty string to disable the mode-line
 lighter for `hippie-namespace-mode'."
   :type 'string
-  (when (>= emacs-major-version 23) :risky)
-  (when (>= emacs-major-version 23) t)
   :group 'hippie-namespace)
+(put 'hippie-namespace-mode-lighter 'risky-local-variable t)
 
 (defcustom hippie-namespace-less-feedback nil
   "Give less echo area feedback."
