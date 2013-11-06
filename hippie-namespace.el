@@ -1,6 +1,6 @@
 ;;; hippie-namespace.el --- Special treatment for namespace prefixes in hippie-expand
 ;;
-;; Copyright (c) 2012 Roland Walker
+;; Copyright (c) 2012-13 Roland Walker
 ;;
 ;; Author: Roland Walker <walker@pobox.com>
 ;; Homepage: http://github.com/rolandwalker/hippie-namespace
@@ -123,8 +123,6 @@
 ;;
 ;;  Simplified BSD License
 ;;
-;;  Copyright (c) 2012, Roland Walker
-;;  All rights reserved.
 ;;  Redistribution and use in source and binary forms, with or
 ;;  without modification, are permitted provided that the following
 ;;  conditions are met:
