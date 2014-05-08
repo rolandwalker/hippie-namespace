@@ -4,7 +4,7 @@
 ;;
 ;; Author: Roland Walker <walker@pobox.com>
 ;; Homepage: http://github.com/rolandwalker/hippie-namespace
-;; URL: http://raw.github.com/rolandwalker/hippie-namespace/master/hippie-namespace.el
+;; URL: http://raw.githubusercontent.com/rolandwalker/hippie-namespace/master/hippie-namespace.el
 ;; Version: 0.5.8
 ;; Last-Updated: 25 Oct 2013
 ;; EmacsWiki: HippieNamespace
