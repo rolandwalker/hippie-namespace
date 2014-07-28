@@ -79,8 +79,8 @@ namespace and non-namespace portions of a symbol.
 
 ## See Also
 
-<kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-namespace</kbd> <kbd>RET</kbd>  
-<kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-expand</kbd> <kbd>RET</kbd>  
+* <kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-namespace</kbd> <kbd>RET</kbd>
+* <kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-expand</kbd> <kbd>RET</kbd>
 
 ## Bugs
 
