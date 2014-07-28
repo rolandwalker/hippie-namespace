@@ -1,12 +1,10 @@
 [![Build Status](https://secure.travis-ci.org/rolandwalker/hippie-namespace.png?branch=master)](http://travis-ci.org/rolandwalker/hippie-namespace)
 
-Overview
-========
+# Overview
 
 Special treatment for namespace prefixes in Emacs hippie-expand.
 
-Quickstart
-----------
+## Quickstart
 
 ```elisp
 (require 'hippie-namespace)
@@ -20,8 +18,7 @@ Quickstart
                      ; key bound to `hippie-expand'.
 ```
 
-Explanation
------------
+## Explanation
 
 The purpose of hippie-namespace is to save typing.
 
@@ -56,8 +53,7 @@ Many people override dabbrev expansion:
 (define-key global-map (kbd "M-/") 'hippie-expand)
 ```
 
-Determining Namespaces
-----------------------
+## Determining Namespaces
 
 The minor mode will examine each buffer to guess namespace prefixes
 dynamically.  If the guess is not good enough, you may add to the
@@ -76,26 +72,22 @@ or by adding a file-local variable at the end of your file:
 Mode-specific namespace finders are easy to write.  Search for "Howto"
 in the source.
 
-Notes
------
+## Notes
 
 Integrates with [expand-region](http://github.com/magnars/expand-region.el), adding an expansion which is aware of the
 namespace and non-namespace portions of a symbol.
 
-See Also
---------
+## See Also
 
 M-x customize-group RET hippie-namespace RET  
 M-x customize-group RET hippie-expand RET  
 
-Bugs
-----
+## Bugs
 
 Breaks using C-u [hippie-expand] to undo. Workaround: use
 regular undo commands.
 
-Compatibility and Requirements
-------------------------------
+## Compatibility and Requirements
 
 	GNU Emacs version 24.4-devel     : yes, at the time of writing
 	GNU Emacs version 24.3           : yes
