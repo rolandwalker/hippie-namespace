@@ -8,7 +8,7 @@ Special treatment for namespace prefixes in Emacs hippie-expand.
 Quickstart
 ----------
 
-```lisp
+```elisp
 (require 'hippie-namespace)
  
 (global-hippie-namespace-mode 1)
@@ -52,7 +52,7 @@ not the case.)
 Note that you should also have `hippie-expand` bound to a key.
 Many people override dabbrev expansion:
 
-```lisp
+```elisp
 (define-key global-map (kbd "M-/") 'hippie-expand)
 ```
 
@@ -67,7 +67,7 @@ list by executing
 
 or by adding a file-local variable at the end of your file:
 
-```lisp
+```elisp
 ;; Local Variables:
 ;; hippie-namespace-local-list: (namespace-1 namespace-2)
 ;; End:
