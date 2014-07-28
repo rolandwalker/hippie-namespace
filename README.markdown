@@ -59,7 +59,7 @@ The minor mode will examine each buffer to guess namespace prefixes
 dynamically.  If the guess is not good enough, you may add to the
 list by executing
 
-	M-x hippie-namespace-add
+<kbd>M-x</kbd> <kbd>hippie-namespace-add</kbd>
 
 or by adding a file-local variable at the end of your file:
 
@@ -79,12 +79,12 @@ namespace and non-namespace portions of a symbol.
 
 ## See Also
 
-M-x customize-group RET hippie-namespace RET  
-M-x customize-group RET hippie-expand RET  
+<kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-namespace</kbd> <kbd>RET</kbd>  
+<kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-expand</kbd> <kbd>RET</kbd>  
 
 ## Bugs
 
-Breaks using C-u [hippie-expand] to undo. Workaround: use
+Breaks using <kbd>C-u</kbd> [hippie-expand] to undo. Workaround: use
 regular undo commands.
 
 ## Compatibility and Requirements
