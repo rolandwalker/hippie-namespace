@@ -4,6 +4,14 @@
 
 Special treatment for namespace prefixes in Emacs hippie-expand.
 
+ * [Quickstart](#quickstart)
+ * [Explanation](#explanation)
+ * [Determining Namespaces](#determining-namespaces)
+ * [Notes](#notes)
+ * [See Also](#see-also)
+ * [Bugs](#bugs)
+ * [Compatibility and Requirements](#compatibility-and-requirements)
+
 ## Quickstart
 
 ```elisp
@@ -79,8 +87,8 @@ namespace and non-namespace portions of a symbol.
 
 ## See Also
 
-* <kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-namespace</kbd> <kbd>RET</kbd>
-* <kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-expand</kbd> <kbd>RET</kbd>
+ * <kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-namespace</kbd> <kbd>RET</kbd>
+ * <kbd>M-x</kbd> <kbd>customize-group</kbd> <kbd>RET</kbd> <kbd>hippie-expand</kbd> <kbd>RET</kbd>
 
 ## Bugs
 
